@@ -21,9 +21,9 @@
     "nodemon": "^2.0.22",
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
+    "moment": "^2.29.4",
     "redis": "^4.6.5",
     "socket.io": "^4.6.1",
-    "soket.io": "^0.0.1-security",
     "uuid": "^9.0.0"
   },
   "keywords": []
