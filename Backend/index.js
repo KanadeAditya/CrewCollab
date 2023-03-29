@@ -6,6 +6,10 @@ const {formatMsg}=require('./utils/message');
 require("dotenv").config();
 const cors = require("cors");
 
+
+const {passport} = require("./google-auth")
+
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -59,6 +63,25 @@ app.get('/',(req,res)=>{
    // Login page will be sent from here
    res.status(200).send('Welcome to SlackBot....');
 })
+
+app.get("/", (req, res) => {
+   res.send("Home Page")
+})
+
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile','email'] }));
+
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login',session:false }),
+   function (req, res) {
+     console.log(req.user);
+    // Successful authentication, redirect home.
+    res.redirect('/');
+  });
+
+
+
+
 
 app.use("/users",usersRoute);
 // app.use(authenticator)
