@@ -2,10 +2,21 @@ const express = require("express");
 const mongoose = require("mongoose")
 const usersRoute = express.Router();
 const {UserModel} =require("../model/user.model.js");
-const {blacklist} = require('../model/blacklisted.js');
-// var  {reft}= require('../blacklist.js');
 const bcrypt = require("bcrypt");
 require("dotenv").config();
+
+//////////REDIS//////////////////
+
+const redis=require('redis');
+const client=redis.createClient({url: process.env.redisURL});
+client.on('error', err => console.log('Redis Client Error', err));
+
+(async function connecting(){
+    await client.connect();
+})()
+
+/////////////////////////////////
+
 const jwt = require("jsonwebtoken")
 const {authenticator} = require("../middleware/authentication.js");
 
@@ -38,22 +49,16 @@ usersRoute.post("/signup",async (req,res)=>{
 
 usersRoute.post("/login",async (req,res)=>{
     let {email,password} = req.body;
-    // console.log(email,password)
     try {
         const user = await UserModel.find({email});
         if(user.length!==0){
             bcrypt.compare(password, user[0].password, (err, result)=>{
-                // result == true
                 if(err){
                     res.send({"msg": err})
                 }else{
                     if(result){
-                        // console.log(user[0]._id)
                         let token = jwt.sign({userID:user[0]._id ,email , name : user[0].name},process.env.normalKey,{expiresIn:60*60});
                         let refreshtoken = jwt.sign({userID:user[0]._id ,email , name : user[0].name},process.env.refreshkey,{expiresIn:60*60*60});
-                        // reft.refreshToken = refreshtoken;
-                        // console.log(req.cookies)
-                        res.cookie("refreshToken",refreshtoken);
                         res.send({msg:"user logged in",token,refreshtoken})
                     }else{
                         res.send({msg:"Wrong password"})
@@ -68,14 +73,19 @@ usersRoute.post("/login",async (req,res)=>{
     }
 })
 
-usersRoute.get("/logout",(req,res)=>{
+usersRoute.get("/logout",async(req,res)=>{
     try {
         let token = req.headers.authorization.split(" ")[0];
         let refreshtoken = req.headers.authorization.split(" ")[1];
-        let black = new blacklist({token,refreshtoken});
-        black.save();
-        res.send({msg:"Log out successfull"})
-    } catch (error) {
+        if (token&&refreshtoken) {
+            await client.SADD('blackTokens',token);
+            await client.SADD('blackTokens',refreshtoken);
+            res.send({msg: "Log out successfull"});
+        } else {
+            res.status(401).send('Unauthorised..!!!');
+        }
+    } 
+    catch (error) {
         res.send({"msg":error.message})
     }
 })
@@ -83,17 +93,16 @@ usersRoute.get("/logout",(req,res)=>{
 usersRoute.get("/refreshtoken",authenticator,async (req,res)=>{
     try {
         let refreshtoken = req.headers.authorization;
+
         if(refreshtoken){
-            let ifexist = await blacklist.find({refreshtoken});
-            
-            if(ifexist.length){
+            let exist = await client.SISMEMBER('blackTokens', refreshtoken);
+            if(exist){
                 res.send({msg:"Please Login Again "});
             }else{
                 jwt.verify(refreshtoken, process.env.refreshkey,(err,decoded)=>{
                     if(err){
                         res.send({"msg":err})
                     }else{
-                        // console.log(decoded.authorID)
                         let {userID ,email , name } = decoded;
                         let token = jwt.sign({userID ,email , name },process.env.normalKey,{expiresIn:60*60});
                         res.send({token})

@@ -1,15 +1,22 @@
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const {blacklist} = require('../model/blacklisted.js')
 require("dotenv").config();
-// var  {reft}= require('../blacklist.js');
 // const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+//////////////////////////////////
+
+const redis=require('redis');
+const client=redis.createClient({url: process.env.redisURL});
+client.on('error', err => console.log('Redis Client Error', err));
+
+(async function connecting(){
+    await client.connect();
+})()
+////////////////////////////////
 
 const authenticator = async (req,res,next)=>{
     const token = req.headers.authorization;
     if(token){
-        let black  = await blacklist.find({token})
-        if(black.length){
+        let black= await client.SISMEMBER('blackTokens', token);
+        if(black){
             res.send({msg:"Please Login Again"})
         }else{
             try {
