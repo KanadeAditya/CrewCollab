@@ -1,47 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>chat_page</title>
     <link rel="stylesheet" href="./styles/chat.css">
+    <title>CrewCollab</title>
 </head>
-
 <body>
-    <!-- <div id="navbar">
-        <div>
-            <img src="" alt="logo"> <span> SlackBot </span>
+    <header>
+        <div class="logo">
+            <img src="./images&icons/prides.png" alt="logo">
         </div>
-        <div>
-            <span>Create Workspace</span>
-            <span>Join Workspace</span>
-        </div>
-        <div>
-            <span>UserName</span>
-        </div>
-    </div>
-    <div id="main">
-        <div id="workspaces">
-            
-        </div>
-    </div> -->
-
-    <div id="room-name" style="background-color: aqua;">
-        <input type="text" id="user-name" placeholder="enter username">
-        <input type="text" id="room-id" placeholder="enter room ID">
-        <button id="room">Submit</button>
-    </div>
-
-    <div id="message" style="border: 1px solid green;">
-        <input type="text" id="msg" placeholder="write your msg">
-        <button id="send">send </button>
-    </div>
-</body>
-
+        <h1>CrewConnect</h1>
+    </header>
+    
+    <main>
+        <div class="sidebar">
+            <div class="workspace-info">
+              <h2>Workspace Name</h2>
+              <p>Current Room: #<span id="current-room-name">general</span></p>
+              <div class="room-btn">
+                <button>Create Room</button>
+                <button>Join Room</button>
+              </div>
+            </div>
+            <div class="room-list">
+                <h3>Rooms Connected:</h3>
+                <ul>
+                  <li>Room 1</li>
+                  <li>Room 2</li>
+                  <li>Room 3</li>
+                </ul>
+              </div>
+            <div class="user-list">
+              <h3>Users in this room:</h3>
+              <ul>
+                <li>User 1</li>
+                <li>User 2</li>
+                <li>User 3</li>
+              </ul>
+            </div>
+            <div class="private-chats">
+                <h3>Private:</h3>
+                <ul>
+                  <li>User 1</li>
+                  <li>User 2</li>
+                  <li>User 3</li>
+                </ul>
+            </div>
+          </div>
+      <div class="chat-window">
+        <ul class="messages">
+          <li class="message received">
+            <div class="message-content">
+                <span class="username">User 1</span>
+              <p>Hello there!</p>
+              <span class="time">10:00 AM</span>
+              
+            </div>
+          </li>
+          <li class="message sent">
+            <div class="message-content">
+                <span class="username">User 2</span>
+              <p>Hi, how are you?</p>
+              <span class="time">10:02 AM</span>
+            </div>
+            <div></div>
+          </li>
+          
+          
+        </ul>
+        <form>
+          <input type="text" placeholder="Type your message here...">
+          <button>Send</button>
+        </form>
+      </div>
+    </main>
+  </body>
+  <script src="./scripts/main.js"></script>
+  <script src="https://cdn.socket.io/4.6.0/socket.io.min.js" integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
 </html>
-<script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
-    integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
-    crossorigin="anonymous"></script>
-<script src="./scripts/main.js"></script>

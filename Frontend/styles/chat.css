@@ -1,8 +1,152 @@
-#navbar{
-    display: flex;
-    justify-content: space-between;
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
 }
 
-#navbar>*{
-border: 1px solid blue;
+header {
+    background-color: #3f0e40;
+    color: white;
+    display: flex;
+    margin-left: 290px;
+    gap: 15px;
+}
+
+header *{
+    padding: 5px;
+}
+
+.logo{
+    width: 5vw;
+}
+
+.logo img{
+    width: 100%
+}
+
+.room-btn{
+    display: flex;
+}
+
+.sidebar {
+    background-color: #2b2d42;
+    color: white;
+    padding: 20px;
+    position: fixed;
+    width: 250px;
+    top: 0;
+    bottom: 0;
+    overflow-y: auto;
+    height: 100%;
+  }
+
+.workspace-info {
+    margin-bottom: 20px;
+}
+
+.user-list,.private-chats ,.room-list {
+    border-top: 1px solid white;
+    margin-top: 20px;
+    padding-top: 20px;
+}
+
+.user-list h3,.private-chats h3 ,.room-list h3  {
+    margin-top: 0;
+}
+
+.user-list ul , .private-chats ul ,.room-list ul{
+    list-style: none;
+    overflow-y: scroll;
+    margin: 0;
+    height: 100px;
+    padding: 0;
+}
+
+.user-list li , .private-chats li, .room-list li {
+    margin-bottom: 10px;
+}
+
+.chat-window {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 0px 15px 0px 270px;
+    max-width: 600px;
+    padding: 0 20px 0 20px;
+    height: 100%;
+}
+
+.messages {
+    height: 500px;
+    list-style: none;
+    margin: 0;
+    padding: 5px;
+    overflow-y: scroll;
+}
+
+.message {
+    display: flex;
+    margin: 10px 0;
+}
+
+.room-btn > button{
+    font-size: 12px;
+}
+
+/* .message .avatar {
+    background-color: #3f0e40;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+} */
+
+.message-content {
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    margin-left: 10px;
+    padding: 10px;
+}
+
+.message-content p {
+    margin: 0;
+}
+
+.message-content .time, .message-content .username{
+    color: gray;
+    font-size: 12px;
+}
+
+.message.sent{
+    /* color: aqua; */
+    position: relative;
+}
+
+form {
+    border: 5px solid  #2b2d42;
+    padding: 5px;
+    display: flex;
+    margin-top: 20px;
+    border-radius: 15px;
+}
+
+input[type="text"] {
+    border-radius: 20px;
+    border: none;
+    flex-grow: 1;
+    padding: 10px;
+}
+
+button {
+    background-color: #3f0e40;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #522c70;
 }
