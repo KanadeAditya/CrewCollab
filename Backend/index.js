@@ -14,6 +14,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 const http = require('http').createServer(app);
+http.listen(8080);
+
 const { Server } = require('socket.io');
 const io = new Server(http);
 
@@ -24,11 +26,11 @@ io.on('connection', (socket) => {
    socket.on("joinRoom", ({ username, room }) => {
 
       //    const user=userJoin({id:socket.id,username,room});
-      socket.join(user.room);
+      // socket.join(user.room);
 
       socket.emit("message", formatMsg('ChatMe', "Welcome to ChatMe server."));
 
-      socket.broadcast.to(user.room).emit("message", formatMsg('ChatMe', `${username} has joined the chat`));
+      // socket.broadcast.to(user.room).emit("message", formatMsg('ChatMe', `${username} has joined the chat`));
 
       io.to(user.room).emit("roomUsers", {
          room: user.room,
