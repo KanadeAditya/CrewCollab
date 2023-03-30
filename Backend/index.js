@@ -14,7 +14,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 const http = require('http').createServer(app);
-http.listen(8080);
+// http.listen(8080);
 
 const { Server } = require('socket.io');
 const io = new Server(http);
@@ -85,8 +85,13 @@ app.get('/auth/google/callback',
 
 
 
+
 app.use("/users", usersRoute);
 // app.use(authenticator)
+
+
+
+
 
 http.listen(process.env.port, async () => {
    try {
