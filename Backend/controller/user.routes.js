@@ -20,6 +20,11 @@ client.on('error', err => console.log('Redis Client Error', err));
 const jwt = require("jsonwebtoken")
 const {authenticator} = require("../middleware/authentication.js");
 
+
+usersRoute.get("/",(req,res)=>{
+    res.send("working")
+})
+
 usersRoute.post("/signup",async (req,res)=>{
     let {name,email,password} = req.body;
 
