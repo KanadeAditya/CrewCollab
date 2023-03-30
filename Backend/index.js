@@ -17,6 +17,9 @@ const { userJoin, getRoomUsers, getCurrentUser, userLeave,  users:onlineusers } 
  
 
 
+const { passport } = require("./google-auth")
+
+
 
 const app = express();
 app.use(cors());
@@ -32,6 +35,8 @@ const io = new Server(http);
 io.on('connection', (socket) => {
 
    console.log('connected a new user');
+
+
 
 
    socket.on("createRoom", async ({ roomName, userID}) => {
@@ -73,8 +78,9 @@ io.on('connection', (socket) => {
 
    
 
+
       });
-      
+
       console.log(onlineusers);
 
    })
@@ -149,7 +155,7 @@ app.use(authenticator)
 
 http.listen(process.env.port, async () => {
    try {
-      await connection; 
+      await connection;
       console.log("Connected to MongoDB");
    } catch (error) {
       console.log({ "error": error.message });
