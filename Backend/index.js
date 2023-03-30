@@ -8,7 +8,7 @@ require("dotenv").config();
 const cors = require("cors");
 
 
-const { passport } = require("./google-auth") 
+const { passport } = require("./google-auth")
 
 
 const app = express();
@@ -25,19 +25,19 @@ io.on('connection', (socket) => {
 
    socket.on("joinRoom", ({ username, room }) => {
       console.log(username, room);
-      const user = userJoin(socket.id, username, room); 
-      
+      const user = userJoin(socket.id, username, room);
+
       socket.join(room);
-      
+
       socket.emit("message", formatMsg('ChatMe', "Welcome to ChatMe server.")); // no need of this message
-      
+
       socket.broadcast.to(room).emit("message", formatMsg('ChatMe', `${username} has joined the chat`));
-      
+
       io.to(room).emit("roomUsers", {
          room,
          users: getRoomUsers(user.room)
       });
-      
+
       console.log(onlineusers);
 
    })
@@ -98,7 +98,7 @@ app.use(authenticator)
 
 http.listen(process.env.port, async () => {
    try {
-      await connection; 
+      await connection;
       console.log("Connected to MongoDB");
    } catch (error) {
       console.log({ "error": error.message });
