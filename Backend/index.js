@@ -6,17 +6,24 @@ const { UserModel } = require('./model/user.model');
 const { RoomUserModel } = require('./model/room.users.model');
 const { authenticator } = require("./middleware/authentication.js");
 const { formatMsg } = require('./utils/message');
+
 const {uniqid} =require('uniqid');
 require("dotenv").config();
 const cors = require("cors");
 
 const { passport } = require("./google-auth")
 
+const { userJoin, getRoomUsers, getCurrentUser, userLeave,  users:onlineusers } = require("./utils/users");
+ 
+
+
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 const http = require('http').createServer(app);
+
+
 
 const { Server } = require('socket.io');
 const io = new Server(http);
@@ -25,6 +32,7 @@ const io = new Server(http);
 io.on('connection', (socket) => {
 
    console.log('connected a new user');
+
 
    socket.on("createRoom", async ({ roomName, userID}) => {
 
@@ -53,7 +61,7 @@ io.on('connection', (socket) => {
    })
 
    socket.on("joinRoom", async ({ username, roomID }) => {
-
+      const user = userJoin(socket.id, username, room); 
       socket.join(roomID);
       socket.emit("message", formatMsg('CrewCollab', `${username} joined`));
 
@@ -62,28 +70,39 @@ io.on('connection', (socket) => {
       io.to(roomID).emit("roomUsers", {
          roomID,
          users: getRoomUsers(room)
+
+   
+
       });
+      
+      console.log(onlineusers);
 
    })
 
-   socket.on("chatMsg", (msg) => {
+   socket.on("chatMsg", (msg, user, room) => {
 
-      const user = getCurrentUser(socket.id);
 
-      io.to(user.room).emit("message", formatMsg(user.username, msg));
+      // const user = getCurrentUser(socket.id); //get the room and username directly 
+      //because msg will go to spcefic rooms
+
+
+      io.to(room).emit("message", formatMsg(user, msg, room));
 
    });
 
    socket.on('disconnect', () => {
 
-      //    const user=userLeave(socket.id);
+      const user = userLeave(socket.id);
+      let rooms = user?.room||[];
+      rooms.forEach(e => {
+         socket.broadcast.to(e).emit("message", formatMsg('ChatMe', `${user.username} has left the chat`));
 
-      socket.broadcast.to(user.room).emit("message", formatMsg('ChatMe', `${user.username} has left the chat`));
+         io.to(e).emit("roomUsers", {
+            room: e,
+            users: getRoomUsers(e)
+         })
+      });
 
-      io.to(user.room).emit("roomUsers", {
-         room: user.room,
-         //    users:getRoomUsers(user.room)
-      })
    })
 })
 //////////////////////
@@ -93,8 +112,26 @@ app.get('/', (req, res) => {
    res.status(200).send('Welcome to SlackBot....');
 })
 
-// app.get('/auth/google',
-//    passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+app.get("/", (req, res) => {
+   res.send("Home Page")
+})
+
+
+app.get('/auth/google',
+   passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+app.get('/auth/google/callback',
+   passport.authenticate('google', { failureRedirect: '/login', session: false }),
+   function (req, res) {
+      console.log(req.user);
+      // Successful authentication, redirect home.
+      res.redirect('/');
+   });
+
+
+
+
 
 // app.get('/auth/google/callback',
 //    passport.authenticate('google', { failureRedirect: '/login', session: false }),
@@ -104,12 +141,15 @@ app.get('/', (req, res) => {
 //       res.redirect('/');
 //    }); 
 
-// app.use("/users", usersRoute);
-// app.use(authenticator)
+
+
+app.use("/users", usersRoute);
+app.use(authenticator)
+
 
 http.listen(process.env.port, async () => {
    try {
-      await connection;
+      await connection; 
       console.log("Connected to MongoDB");
    } catch (error) {
       console.log({ "error": error.message });
