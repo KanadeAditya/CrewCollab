@@ -14,7 +14,7 @@ const userJoin = (id, username, roomName) => {
 }
 
 const getRoomUsers = (room) => {
-    return users.filter(user => user.room == room);
+    return users.filter(user => (user.room).includes(room));
 }
 
 const getCurrentUser = (id) => {
@@ -29,4 +29,4 @@ const userLeave = (id) => {
     }
 }
 
-module.exports = { userJoin, getRoomUsers, getCurrentUser, userLeave }
+module.exports = { userJoin, getRoomUsers, getCurrentUser, userLeave, users }
