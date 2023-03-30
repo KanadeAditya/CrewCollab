@@ -1,14 +1,14 @@
 const express = require("express");
-// const { connection, client } = require("./db.js");
-// const { usersRoute } = require("./controller/user.routes.js");
-// const { authenticator } = require("./middleware/authentication.js");
+const { connection, client } = require("./db.js");
+const { usersRoute } = require("./controller/user.routes.js");
+const { authenticator } = require("./middleware/authentication.js");
 const { formatMsg } = require('./utils/message');
 const { userJoin, getRoomUsers, getCurrentUser, userLeave,  users:onlineusers } = require("./utils/users");
 require("dotenv").config();
 const cors = require("cors");
 
 
-// const { passport } = require("./google-auth") AbhinavCommented
+const { passport } = require("./google-auth") 
 
 
 const app = express();
@@ -25,7 +25,7 @@ io.on('connection', (socket) => {
 
    socket.on("joinRoom", ({ username, room }) => {
       console.log(username, room);
-      const user = userJoin(socket.id, username, room);
+      const user = userJoin(socket.id, username, room); 
       
       socket.join(room);
       
@@ -77,28 +77,28 @@ app.get("/", (req, res) => {
    res.send("Home Page")
 })
 
-// Abhinav commented.....
-// app.get('/auth/google',
-//    passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-// app.get('/auth/google/callback',
-//    passport.authenticate('google', { failureRedirect: '/login', session: false }),
-//    function (req, res) {
-//       console.log(req.user);
-//       // Successful authentication, redirect home.
-//       res.redirect('/');
-//    });
+app.get('/auth/google',
+   passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-
+app.get('/auth/google/callback',
+   passport.authenticate('google', { failureRedirect: '/login', session: false }),
+   function (req, res) {
+      console.log(req.user);
+      // Successful authentication, redirect home.
+      res.redirect('/');
+   });
 
 
 
-// app.use("/users", usersRoute);
-// app.use(authenticator)
+
+
+app.use("/users", usersRoute);
+app.use(authenticator)
 
 http.listen(process.env.port, async () => {
    try {
-      // await connection;   Abhinav commented
+      await connection; 
       console.log("Connected to MongoDB");
    } catch (error) {
       console.log({ "error": error.message });
