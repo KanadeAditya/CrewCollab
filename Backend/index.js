@@ -1,9 +1,9 @@
 const express = require("express");
 const { connection, client } = require("./db.js");
 const { usersRoute } = require("./controller/user.routes.js");
+const { messegerouter } = require("./controller/messeges.route.js");
 const { RoomModel } = require('./model/room.model');
 const { UserModel } = require('./model/user.model');
-const { RoomUserModel } = require('./model/room.users.model');
 const { authenticator } = require("./middleware/authentication.js");
 const { formatMsg } = require('./utils/message');
 
@@ -14,10 +14,6 @@ const cors = require("cors");
 const { passport } = require("./google-auth")
 
 const { userJoin, getRoomUsers, getCurrentUser, userLeave,  users:onlineusers } = require("./utils/users");
- 
-
-
-const { passport } = require("./google-auth")
 
 
 
@@ -25,10 +21,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 const http = require('http').createServer(app);
-
-
-
 const { Server } = require('socket.io');
+const { MessageModel } = require("./model/message.model.js");
 const io = new Server(http);
 
 //////////////////////
@@ -36,10 +30,7 @@ io.on('connection', (socket) => {
 
    console.log('connected a new user');
 
-
-
-
-   socket.on("createRoom", async ({ roomName, userID}) => {
+   socket.on("createRoom", async ({ email, roomName, userID}) => {
 
       const roomID=uniqid();
       // Just for creation of the room
@@ -47,38 +38,30 @@ io.on('connection', (socket) => {
       await newRoom.save();
 
       // Just for rooms and their connected users
-      // const userRoom = new RoomUserModel({room: roomID, admin:userID, users:[userID] });
-      // await userRoom.save();
-
-      // await UserModel.findByIdAndUpdate({_id:userID},{
-      //    rooms: [{type:string, default:null}]
-      // })
-
       
       socket.join(roomID);
       socket.emit("message", formatMsg('CrewCollab', `You created the group ${roomName}`));
 
-      io.to(roomID).emit("roomUsers", {
-         roomID,
-         users: getRoomUsers(room)
-      });
-
+      // Saving user message to DB
+      const msg= new MessageModel({email, message:`You created the group ${roomName}`, roomname:roomID, userID, time:Date.now()});
+      await msg.save();
    })
 
-   socket.on("joinRoom", async ({ username, roomID }) => {
-      const user = userJoin(socket.id, username, room); 
+   socket.on("joinRoom", async ({ email,username, userID, roomID }) => {
+      // Below function is just checking the onlne users
+      const online_users = userJoin(socket.id, userID, room); 
+
       socket.join(roomID);
-      socket.emit("message", formatMsg('CrewCollab', `${username} joined`));
 
       socket.broadcast.to(roomID).emit("message", formatMsg('CrewCollab', `${username} joined`));
+      
+      const msg= new MessageModel({email, message:`${username} joined`, roomname:roomID, userID, time:Date.now()});
+
+      await msg.save();
 
       io.to(roomID).emit("roomUsers", {
          roomID,
          users: getRoomUsers(room)
-
-   
-
-
       });
 
       console.log(onlineusers);
@@ -124,16 +107,16 @@ app.get("/", (req, res) => {
 })
 
 
-app.get('/auth/google',
-   passport.authenticate('google', { scope: ['profile', 'email'] }));
+// app.get('/auth/google',
+//    passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-app.get('/auth/google/callback',
-   passport.authenticate('google', { failureRedirect: '/login', session: false }),
-   function (req, res) {
-      console.log(req.user);
-      // Successful authentication, redirect home.
-      res.redirect('/');
-   });
+// app.get('/auth/google/callback',
+//    passport.authenticate('google', { failureRedirect: '/login', session: false }),
+//    function (req, res) {
+//       console.log(req.user);
+//       // Successful authentication, redirect home.
+//       res.redirect('/');
+//    });
 
 
 
@@ -150,8 +133,8 @@ app.get('/auth/google/callback',
 
 
 app.use("/users", usersRoute);
-app.use(authenticator)
-
+// app.use(authenticator)
+app.use("/message",messegerouter)
 
 http.listen(process.env.port, async () => {
    try {
