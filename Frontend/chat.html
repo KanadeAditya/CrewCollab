@@ -1,279 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./styles/chat.css">
-    <title>CrewCollab</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./styles/chat.css">
+  <title>CrewCollab</title>
 </head>
+
 <body>
-    <header>
-        <div class="logo">
-            <img src="./images&icons/prides.png" alt="logo">
+  <header>
+    <div class="logo">
+      <img src="./images&icons/prides.png" alt="logo">
+    </div>
+    <h1>CrewConnect</h1>
+  </header>
+
+  <main>
+    <div class="sidebar">
+      <div class="workspace-info">
+        <h2>Workspace Name</h2>
+        <p>Current Room: #<span id="current-room-name">general</span></p>
+        <div class="room-btn">
+          <button onclick="roomCreate()">Create Room</button>
+          <button onclick="getusername()">Join Room</button>
         </div>
-        <h1>CrewConnect</h1>
-    </header>
-    
-    <main>
-        <div class="sidebar">
-            <div class="workspace-info">
-              <h2>Workspace Name</h2>
-              <p>Current Room: #<span id="current-room-name">general</span></p>
-              <div class="room-btn">
-                <button>Create Room</button>
-                <button>Join Room</button>
-              </div>
-            </div>
-            <div class="room-list">
-                <h3>Rooms Connected:</h3>
-                <ul>
-                  <li>Room 1</li>
-                  <li>Room 2</li>
-                  <li>Room 3</li>
-                </ul>
-              </div>
-            <div class="user-list">
-              <h3>Users in this room:</h3>
-              <ul>
-                <li>User 1</li>
-                <li>User 2</li>
-                <li>User 3</li>
-              </ul>
-            </div>
-            <div class="private-chats">
-                <h3>Private:</h3>
-                <ul>
-                  <li>User 1</li>
-                  <li>User 2</li>
-                  <li>User 3</li>
-                </ul>
-            </div>
-          </div>
-      <div class="chat-window">
-        <ul class="messages">
-          <li class="message received">
-            <div class="message-content">
-                <span class="username">User 1</span>
-              <p>Hello there!</p>
-              <span class="time">10:00 AM</span>
-              
-            </div>
-          </li>
-          <li class="message sent">
-            <div class="message-content">
-                <span class="username">User 2</span>
-              <p>Hi, how are you?</p>
-              <span class="time">10:02 AM</span>
-            </div>
-            <div></div>
-          </li>
-          
-          
-        </ul>
-        <form>
-          <input type="text" placeholder="Type your message here...">
-          <button>Send</button>
-        </form>
       </div>
-    </main>
-  </body>
-  <script src="./scripts/main.js"></script>
-  <script src="https://cdn.socket.io/4.6.0/socket.io.min.js" integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
+      <div class="room-list">
+        <h3>Rooms Connected:</h3>
+        <ul id="rm-list">
+          <li>Room 1</li>
+          <li>Room 2</li>
+          <li>Room 3</li>
+        </ul>
+      </div>
+      <div class="user-list">
+        <h3>Users in this room:</h3>
+        <ul>
+          <li>User 1</li>
+          <li>User 2</li>
+          <li>User 3</li>
+        </ul>
+      </div>
+
+      <div class="private-chats">
+        <h3>Private:</h3>
+        <ul>
+          <li>User 1</li>
+          <li>User 2</li>
+          <li>User 3</li>
+        </ul>
+      </div>
+    </div>
+    <div class="chat-window">
+      <ul class="messages">
+        <li class="message received">
+          <div class="message-content">
+            <span class="username">User 1</span>
+            <p>Hello there!</p>
+            <span class="time">10:00 AM</span>
+
+          </div>
+        </li>
+        <li class="message sent">
+          <div class="message-content">
+            <span class="username">User 2</span>
+            <p>Hi, how are you?</p>
+            <span class="time">10:02 AM</span>
+          </div>
+          <div></div>
+        </li>
 
 
-<!-- this script created by tarun -->
- 
-   <script>
-    let queryString = window.location.search.split("=")
-    let code=queryString[1]
-    const client_id = "ecf89f42afe601c8d613";
-const client_secret = "1e2bdd5424e9abb53f7422c3017c11c66718da13";
-  
-   
+      </ul>
+      <form>
+        <input id="new-msg" type="text" placeholder="Type your message here...">
+        <button id="send-msg">Send</button>
+      </form>
+    </div>
+  </main>
+</body>
+<script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+  integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
+<script src="./scripts/main.js"></script>
 
-    
-
-//   let accessToken =  fetch("https://github.com/login/oauth/access_token", {
-//     method: "POST",
-//     headers: {
-//       Accept: "application/json",
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({
-//       client_id: client_id,
-//       client_secret: client_secret,
-//       code,
-//     }),
-//   })
-//   .then((res) => res.json());
- 
-// console.log(accessToken)
-
-//   //access token
-//   const access_token = accessToken.access_token;
-// console.log(access_token)
-    
-//   step2(code,client_id,client_secret)
-
-
-
-  let gitDetails = async (code) => {
-    try {
-      let res = await fetch(`http://localhost:4040/users/auth/github?code=${code}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-       
-    
-      });
-
-      let obj = await res.json();
-      console.log(obj);
-      sign_fun(obj)
-      
-      // alert(data.ms);
-      //set token
-      // localStorage.setItem("token", data.token);
-      // localStorage.setItem("refreshtoken", data.refreshtoken);
-    } catch (error) {
-      console.log(error);
-      alert("error");
-    }
-  };
-  gitDetails(code)
-
-
-  //sign up
- 
-
-  let sign_fun = async (obj) => {
-    // console.log(obj)
-    let newobj = {
-    "name" : obj.name,
-    "email" : obj.email,
-    "password" : obj.password
-  }
-    try {
-      let res = await fetch("http://localhost:4040/users/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newobj),
-      })
-      // if(res) {
-        let data = await res.json();
-        console.log(data);
-        // console.log(data.newuser)
-        login_fun(data.newuser)
-
-        alert(data.msg);
-       
-      // }
-    } catch (error) {
-      console.log(error);
-      alert("error");
-    }
-  };
-
-
-//login
-
-
-
-let login_fun = async (obj) => {
-  let newobj = {
-    "email" : obj.email,
-    "password" : obj.password
-  }
-  console.log(newobj)
-    try {
-      let res = await fetch("http://localhost:4040/users/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newobj),
-      });
-
-      let data = await res.json();
-      console.log(data);
-      alert(data.msg);
-      //set token
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("refreshtoken", data.refreshtoken);
-    } catch (error) {
-      console.log(error);
-      alert("error");
-    }
-  };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//   const userDetails = await fetch("https://api.github.com/user", {
-//     method: "GET",
-//     headers: {
-//       Authorization: `Bearer ${access_token}`,
-//     },
-//   }).then((res) => res.json());
-
-//   console.log(userDetails);
-// //   console.log(accessToken);
-//   // let userData = accessToken
-
-//   let obj = {
-//       name : userDetails.name,
-//       email : userDetails.email,
-//       password :  userDetails.id
-//   }
-//   console.log(obj)
-  
-//   res.send("authenticate")
-
-//   let { name,email, password } = obj;
-//   console.log(name,email,password)
-//   const user = new UserModel({email,password,name})
-//   await user.save()
-//   res.send(obj)
-// console.log(obj)
-
-  // sign in login
-// try {
-//     const sign = await fetch("http://localhost:4040/users/signup", {
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json",
-//             Authorization: `Bearer ${access_token}`
-//           },
-//           body: JSON.stringify(obj)
-//       }).then((res) => res.json());
-    
-//       res.send(sign) 
-// } catch (error) {
-//     res.send(error.message)
-// }
-  
-
-  
-
-
-
-
-
-
-
-  </script> 
 </html>

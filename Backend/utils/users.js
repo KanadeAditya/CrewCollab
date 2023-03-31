@@ -4,17 +4,17 @@ const users = [];
 const userJoin = (id, username, roomName) => {
     let user = users.find(user => user.id == id);
     if (user) {
-        user.room.push(roomName);
+        user.roomID.push(roomName);
     }
     else {
-        user = { username, id, room: [roomName] };
+        user = { username, id, roomID: [roomName] };
         users.push(user);
     }
     return user;
 }
 
 const getRoomUsers = (room) => {
-    return users.filter(user => (user.room).includes(room));
+    return users.filter(user => (user.roomID).includes(room));
 }
 
 const getCurrentUser = (id) => {

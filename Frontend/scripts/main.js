@@ -1,51 +1,81 @@
-const userName = document.getElementById('user-name');
-const roomId = document.getElementById('room-id');
-const room_Id = document.getElementById('room_id');
-const Room = document.getElementById('room');
+// const user = {
+//     name: 'user',
+//     rooms: [roomid, roomid2],
+//     msg: {
+//         room_id: [{}, {}],
+//         room_id2: [{}, {}],
+//         room_id: [{}, {}],
+//     }
+// }
 
-const message = document.getElementById('msg');
-const send = document.getElementById('send')
-
-
-
+let username = 'Aman';
+function getusername() {
+    let data = prompt("Enter username",);
+    if (data != null) {
+        username = data;
+        console.log('user is-->', username);
+    }
+}
 
 const socket = io("http://localhost:8080/", { transports: ["websocket"] });
 
-Room.addEventListener('click', () => {
-    const username = userName.value;
-    let room = roomId.value; 
-    room = room.trim().split(' ');
 
-    room.forEach(e => {
-        socket.emit("joinRoom", { username, room: e });
+function roomCreate() {
+    let roomID = prompt("Enter your room",);
+    if (roomID != null) {
+        console.log(roomID);
+        console.log('room created', username, roomID);
+        createRoom(roomID);
+    }
 
-    });
+}
 
+let sendbtn = document.getElementById('send-msg');
+// room creation
+function createRoom(roomID) {
+    let roomList = document.getElementById('rm-list');
+    let newRoom = document.createElement('li')
+    newRoom.innerText = `Room ${roomID}`
+    newRoom.setAttribute('class', 'room');
+    newRoom.dataset.id = roomID;
+    roomList.append(newRoom)
 
-    console.log('room created', userName.value, room);
+    newRoom.addEventListener('click', (e) => {
+        // console.log(e.target.dataset.id);
+
+        // fetch room messages here and call append function to show message on container
+
+        socket.emit("joinRoom", { username, roomID }); // join room
+
+        sendbtn.dataset.room = roomID;
+    })
+}
+sendbtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    let newMsg = document.getElementById('new-msg').value;
+    // console.log(newMsg, 'room:', e.target.dataset.room);
+    socket.emit('chatMsg', newMsg, username, e.target.dataset.room);
 })
+
+
+let msgul = document.querySelector(".messages");
 
 socket.on("message", (message) => {
 
     // outputMessage(message);
     console.log(message);
+    // Append message on container
+    // let msgli = document.createElement('li')
+    // msgli.innerHTML = `<div> message1</div>`;
+    // msgul.append(msgli);
 
 })
 
-send.addEventListener('click', () => {
-    const msg = message.value;
-    const Room_Id = room_Id.value;
-    console.log('msg send', msg, userName.value, Room_Id);
-    socket.emit('chatMsg', msg, userName.value, Room_Id);
-    message.value = '';
-
-})
-
-socket.on("roomUsers", ({ room, users }) => {
+socket.on("roomUsers", ({ roomID, users }) => {
 
     // roomName.innerText= room;
-    console.log({ room, users });
+    console.log({ roomID, users });
 
-    // outputRoomUsers(users)
+    // outputRoomUsers(users) for online users
 
 })

@@ -1,17 +1,19 @@
 const express = require("express");
+
 const { connection, client } = require("./db.js");
 const { usersRoute } = require("./controller/user.routes.js");
 const { messegerouter } = require("./controller/messeges.route.js");
 const { RoomModel } = require('./model/room.model');
 const { UserModel } = require('./model/user.model');
 const { authenticator } = require("./middleware/authentication.js");
+
 const { formatMsg } = require('./utils/message');
 
 const {uniqid} =require('uniqid');
 require("dotenv").config();
 const cors = require("cors");
 
-const { passport } = require("./google-auth")
+// const { passport } = require("./google-auth")
 
 const { userJoin, getRoomUsers, getCurrentUser, userLeave,  users:onlineusers } = require("./utils/users");
 
@@ -48,11 +50,13 @@ io.on('connection', (socket) => {
       await msg.save();
    })
 
+
    socket.on("joinRoom", async ({ email,username, userID, roomID }) => {
       // Below function is just checking the onlne users
       const online_users = userJoin(socket.id, userID, room); 
-
+      socket.emit("message", formatMsg('CrewCollab', `Welcome to Slack`));
       socket.join(roomID);
+
 
       socket.broadcast.to(roomID).emit("message", formatMsg('CrewCollab', `${username} joined`));
       
@@ -62,7 +66,7 @@ io.on('connection', (socket) => {
 
       io.to(roomID).emit("roomUsers", {
          roomID,
-         users: getRoomUsers(room)
+         users: getRoomUsers(roomID)
       });
 
       console.log(onlineusers);
@@ -107,9 +111,14 @@ app.get("/", (req, res) => {
    res.send("Home Page")
 })
 
+// Abhinav
+// app.get('/auth/google',
+//    passport.authenticate('google', { scope: ['profile', 'email'] }));
+
 
 // app.get('/auth/google',
 //    passport.authenticate('google', { scope: ['profile', 'email'] }));
+
 
 // app.get('/auth/google/callback',
 //    passport.authenticate('google', { failureRedirect: '/login', session: false }),
@@ -136,10 +145,10 @@ usersRoute.get("/chat",(req,res)=>{
    res.sendFile("Frontend\chat.html")
 })
 
-
 app.use("/users", usersRoute);
-// app.use(authenticator)
-app.use("/message",messegerouter)
+app.use(authenticator);
+app.use("/message",messegerouter);
+
 
 http.listen(process.env.port, async () => {
    try {
