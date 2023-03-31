@@ -2,7 +2,7 @@ const express = require("express");
 
 const { connection, client } = require("./db.js");
 const { usersRoute } = require("./controller/user.routes.js");
-const { messegerouter } = require("./controller/messeges.route.js");
+const { messegerouter } = require("./controller/message.controller.js");
 const { RoomModel } = require('./model/room.model');
 const { UserModel } = require('./model/user.model');
 const { authenticator } = require("./middleware/authentication.js");
@@ -146,7 +146,6 @@ usersRoute.get("/chat",(req,res)=>{
 })
 
 app.use("/users", usersRoute);
-app.use(authenticator);
 app.use("/message",messegerouter);
 
 
