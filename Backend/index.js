@@ -1,23 +1,23 @@
 const express = require("express");
-const { connection, client } = require("./db.js");
-const { usersRoute } = require("./controller/user.routes.js");
-const { RoomModel } = require('./model/room.model');
-const { UserModel } = require('./model/user.model');
-const { RoomUserModel } = require('./model/room.users.model');
-const { authenticator } = require("./middleware/authentication.js");
+// const { connection, client } = require("./db.js");
+// const { usersRoute } = require("./controller/user.routes.js");
+// const { RoomModel } = require('./model/room.model');
+// const { UserModel } = require('./model/user.model');
+// const { RoomUserModel } = require('./model/room.users.model');
+// const { authenticator } = require("./middleware/authentication.js");
 const { formatMsg } = require('./utils/message');
 
 const {uniqid} =require('uniqid');
 require("dotenv").config();
 const cors = require("cors");
 
-const { passport } = require("./google-auth")
+// const { passport } = require("./google-auth")
 
 const { userJoin, getRoomUsers, getCurrentUser, userLeave,  users:onlineusers } = require("./utils/users");
  
 
 
-const { passport } = require("./google-auth")
+
 
 
 
@@ -66,18 +66,16 @@ io.on('connection', (socket) => {
    })
 
    socket.on("joinRoom", async ({ username, roomID }) => {
-      const user = userJoin(socket.id, username, room); 
+      console.log(username,roomID);
+      const user = userJoin(socket.id, username, roomID); 
       socket.join(roomID);
-      socket.emit("message", formatMsg('CrewCollab', `${username} joined`));
+      socket.emit("message", formatMsg('CrewCollab', `Welcome to Slack`));
 
       socket.broadcast.to(roomID).emit("message", formatMsg('CrewCollab', `${username} joined`));
 
       io.to(roomID).emit("roomUsers", {
          roomID,
-         users: getRoomUsers(room)
-
-   
-
+         users: getRoomUsers(roomID)
 
       });
 
@@ -123,17 +121,17 @@ app.get("/", (req, res) => {
    res.send("Home Page")
 })
 
+// Abhinav
+// app.get('/auth/google',
+//    passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-app.get('/auth/google',
-   passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-app.get('/auth/google/callback',
-   passport.authenticate('google', { failureRedirect: '/login', session: false }),
-   function (req, res) {
-      console.log(req.user);
-      // Successful authentication, redirect home.
-      res.redirect('/');
-   });
+// app.get('/auth/google/callback',
+//    passport.authenticate('google', { failureRedirect: '/login', session: false }),
+//    function (req, res) {
+//       console.log(req.user);
+//       // Successful authentication, redirect home.
+//       res.redirect('/');
+//    });
 
 
 
@@ -149,13 +147,13 @@ app.get('/auth/google/callback',
 
 
 
-app.use("/users", usersRoute);
-app.use(authenticator)
+// app.use("/users", usersRoute); abhinav
+// app.use(authenticator) abhinav
 
 
 http.listen(process.env.port, async () => {
    try {
-      await connection;
+      // await connection; Abhinav
       console.log("Connected to MongoDB");
    } catch (error) {
       console.log({ "error": error.message });
