@@ -1,6 +1,7 @@
 const express = require("express");
 const { connection, client } = require("./db.js");
 const { usersRoute } = require("./controller/user.routes.js");
+const { messegerouter } = require("./controller/messeges.route.js");
 const { RoomModel } = require('./model/room.model');
 const { UserModel } = require('./model/user.model');
 const { RoomUserModel } = require('./model/room.users.model');
@@ -17,7 +18,7 @@ const { userJoin, getRoomUsers, getCurrentUser, userLeave,  users:onlineusers } 
  
 
 
-const { passport } = require("./google-auth")
+// const { passport } = require("./google-auth") uncomment
 
 
 
@@ -124,16 +125,16 @@ app.get("/", (req, res) => {
 })
 
 
-app.get('/auth/google',
-   passport.authenticate('google', { scope: ['profile', 'email'] }));
+// app.get('/auth/google',
+//    passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-app.get('/auth/google/callback',
-   passport.authenticate('google', { failureRedirect: '/login', session: false }),
-   function (req, res) {
-      console.log(req.user);
-      // Successful authentication, redirect home.
-      res.redirect('/');
-   });
+// app.get('/auth/google/callback',
+//    passport.authenticate('google', { failureRedirect: '/login', session: false }),
+//    function (req, res) {
+//       console.log(req.user);
+//       // Successful authentication, redirect home.
+//       res.redirect('/');
+//    }); uncomment
 
 
 
@@ -151,6 +152,7 @@ app.get('/auth/google/callback',
 
 app.use("/users", usersRoute);
 app.use(authenticator)
+app.use("/message",messegerouter)
 
 
 http.listen(process.env.port, async () => {

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+
+    <!-- fontosm cdn  -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <!-- iconscout  -->
+    <link
+      rel="stylesheet"
+      href="https://unicons.iconscout.com/release/v4.0.0/css/line.css"
+    />
+   <link rel="stylesheet" href="./styles/login.css">
+  </head>
+  <body>
+    <div class="logo_div">
+      <img class="logo" src="./images&icons/prides.png" alt="" />
+    </div>
+
+    <div class="sign_div">
+      <br />
+      <!-- <input type="text" name="" id="name" placeholder="Enter Your Name"><br> -->
+
+      <input
+        type="text"
+        name=""
+        id="email"
+        placeholder="Enter Your Email"
+      /><br /><br />
+      <input
+        type="text"
+        name=""
+        id="password"
+        placeholder="Enter Your Password"
+      />
+      <button class="sign_btn">Login</button>
+      <br />
+      <!-- <button class="git"><i class="fa-brands fa-github fa-1x"></i> &nbsp;  Sign in with Github</button> -->
+
+      <a
+        href="https://github.com/login/oauth/authorize?client_id=ecf89f42afe601c8d613&scope=user:email"
+        ><button class="git">
+          <i class="fa-brands fa-github fa-1x"></i> &nbsp; Sign in with Github
+        </button></a
+      >
+
+      <br />
+      <button class="google">
+        <i class="fa-brands fa-google fa-1x"></i> &nbsp; Sign in with Google
+      </button>
+      <br /><br />
+    </div>
+  </body>
+</html>
+<script src="./scripts/login.js"></script>
