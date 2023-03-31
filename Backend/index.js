@@ -15,7 +15,8 @@ const { passport } = require("./google-auth")
 
 const { userJoin, getRoomUsers, getCurrentUser, userLeave,  users:onlineusers } = require("./utils/users");
 
-
+//commented by tarun
+// const { passport } = require("./google-auth")
 
 const app = express();
 app.use(cors());
@@ -130,6 +131,10 @@ app.get("/", (req, res) => {
 //       res.redirect('/');
 //    }); 
 
+
+usersRoute.get("/chat",(req,res)=>{
+   res.sendFile("Frontend\chat.html")
+})
 
 
 app.use("/users", usersRoute);

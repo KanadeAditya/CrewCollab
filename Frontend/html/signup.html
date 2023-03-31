@@ -97,7 +97,7 @@
   });
   let sign_fun = async (obj) => {
     try {
-      let res = await fetch("http://localhost:5000/users/signup", {
+      let res = await fetch("http://localhost:4040/users/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -108,6 +108,7 @@
         let data = await res.json();
         console.log(data);
         alert(data.msg);
+        window.location.href="login.html"
       // }
     } catch (error) {
       console.log(error);

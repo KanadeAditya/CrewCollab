@@ -5,6 +5,7 @@ const { UserModel } = require("../model/user.model.js");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 
+//cors
 
 
 //////////REDIS//////////////////
@@ -47,7 +48,8 @@ usersRoute.post("/signup", async (req, res) => {
         } else {
           const newuser = new UserModel({ name, email, password: hash });
           await newuser.save();
-          res.send({ msg: "User Registered" });
+
+          res.send({ msg: "User Registered",newuser });
         }
       }
     });
@@ -148,7 +150,15 @@ usersRoute.get("/userdata/:id", async (req, res) => {
   res.send(data);
 });
 
+
+
+
 //Github Oauth code
+
+// usersRoute.get("/check" , (req,res)=>{
+//     res.send("tarun")
+// })
+
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
@@ -157,6 +167,7 @@ const client_secret = "1e2bdd5424e9abb53f7422c3017c11c66718da13";
 
 usersRoute.get("/auth/github", async (req, res) => {
   const { code } = req.query;
+//   res.send(code)
 
   let accessToken = await fetch("https://github.com/login/oauth/access_token", {
     method: "POST",
@@ -185,9 +196,9 @@ usersRoute.get("/auth/github", async (req, res) => {
   // let userData = accessToken
 
   let obj = {
-      name : userDetails.name,
-      email : userDetails.email,
-      password :  userDetails.id
+      "name" : userDetails.name,
+      "email" : userDetails.email,
+      "password" :  userDetails.login
   }
   console.log(obj)
 //   res.send("authenticate")
@@ -200,26 +211,28 @@ usersRoute.get("/auth/github", async (req, res) => {
 // console.log(obj)
 
   // sign in login
-try {
-    const sign = await fetch("http://localhost:4040/users/signup", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${access_token}`
-          },
-          body: JSON.stringify(obj)
-      }).then((res) => res.json());
+// try {
+//     const sign = await fetch("http://localhost:4040/users/signup", {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json",
+//             Authorization: `Bearer ${access_token}`
+//           },
+//           body: JSON.stringify(obj)
+//       }).then((res) => res.json());
     
-      res.send(sign) 
-} catch (error) {
-    res.send(error.message)
-}
+//       res.send(sign) 
+// } catch (error) {
+//     res.send(error.message)
+// }
   
 
 
-//     console.log(sign)
-//     res.send(sign.msg)
+    // console.log(sign)
+    // res.send(sign.msg)
+    res.send(obj)
   
+
 
 });
 
