@@ -16,8 +16,8 @@ const { passport } = require("./google-auth")
 const { userJoin, getRoomUsers, getCurrentUser, userLeave,  users:onlineusers } = require("./utils/users");
  
 
-
-const { passport } = require("./google-auth")
+//commented by tarun
+// const { passport } = require("./google-auth")
 
 
 
@@ -124,16 +124,16 @@ app.get("/", (req, res) => {
 })
 
 
-app.get('/auth/google',
-   passport.authenticate('google', { scope: ['profile', 'email'] }));
+// app.get('/auth/google',
+//    passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-app.get('/auth/google/callback',
-   passport.authenticate('google', { failureRedirect: '/login', session: false }),
-   function (req, res) {
-      console.log(req.user);
-      // Successful authentication, redirect home.
-      res.redirect('/');
-   });
+// app.get('/auth/google/callback',
+//    passport.authenticate('google', { failureRedirect: '/login', session: false }),
+//    function (req, res) {
+//       console.log(req.user);
+//       // Successful authentication, redirect home.
+//       res.redirect('/');
+//    });
 
 
 
@@ -147,6 +147,10 @@ app.get('/auth/google/callback',
 //       res.redirect('/');
 //    }); 
 
+
+usersRoute.get("/chat",(req,res)=>{
+   res.sendFile("Frontend\chat.html")
+})
 
 
 app.use("/users", usersRoute);
