@@ -8,34 +8,44 @@
 //     }
 // }
 
-let username = 'Aman';
-function getusername() {
-    let data = prompt("Enter username",);
-    if (data != null) {
-        username = data;
-        console.log('user is-->', username);
-    }
-}
 
-const socket = io("http://localhost:8080/", { transports: ["websocket"] });
+const token = localStorage.getItem("token");
+const refreshtoken = localStorage.getItem("refreshtoken");
+console.log(token, '\n', refreshtoken);
 
+// { write a function to fetch all room data, with their ids & name and call createRoom(roomName, roomID)  } 
+
+const socket = io("http://localhost:4040/", { transports: ["websocket"] });
+
+let username = localStorage.getItem("user") || 'Aman';
+console.log(username);
 
 function roomCreate() {
-    let roomID = prompt("Enter your room",);
-    if (roomID != null) {
-        console.log(roomID);
-        console.log('room created', username, roomID);
-        createRoom(roomID);
+    let roomName = prompt("Enter your room",);
+    if (roomName != null) {
+        console.log(roomName);
+        console.log('room created', username, roomName);
     }
-
+    socket.emit("createRoom", { roomName, token }); // room creation
 }
+
+function roomJoin() {
+    let data = prompt("Enter roomId",);
+    if (data != null) {
+        socket.emit("joinRoom", { token, roomID: data });
+    }
+}
+
+socket.on('room_li_create', (roomName, roomID) => {
+    createRoom(roomName, roomID);
+})
 
 let sendbtn = document.getElementById('send-msg');
 // room creation
-function createRoom(roomID) {
+function createRoom(roomName, roomID) {
     let roomList = document.getElementById('rm-list');
     let newRoom = document.createElement('li')
-    newRoom.innerText = `Room ${roomID}`
+    newRoom.innerText = `Room ${roomName}`
     newRoom.setAttribute('class', 'room');
     newRoom.dataset.id = roomID;
     roomList.append(newRoom)
@@ -45,16 +55,17 @@ function createRoom(roomID) {
 
         // fetch room messages here and call append function to show message on container
 
-        socket.emit("joinRoom", { username, roomID }); // join room
+        socket.emit("fetchmessages", {token, roomID: data }); // join room
 
-        sendbtn.dataset.room = roomID;
+        sendbtn.dataset.room = roomName;
+        sendbtn.dataset.id = roomID;
     })
 }
 sendbtn.addEventListener('click', (e) => {
     e.preventDefault();
     let newMsg = document.getElementById('new-msg').value;
     // console.log(newMsg, 'room:', e.target.dataset.room);
-    socket.emit('chatMsg', newMsg, username, e.target.dataset.room);
+    socket.emit('chatMsg', newMsg, username, e.target.dataset.id);
 })
 
 

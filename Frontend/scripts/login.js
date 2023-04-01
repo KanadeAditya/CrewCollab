@@ -26,6 +26,8 @@ let sign_fun = async (obj) => {
         //set token
         localStorage.setItem("token", data.token);
         localStorage.setItem("refreshtoken", data.refreshtoken);
+        localStorage.setItem('user',obj.email);
+        window.location.href='chat.html';
     } catch (error) {
         console.log(error);
         alert("error");
