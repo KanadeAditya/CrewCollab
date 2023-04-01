@@ -15,7 +15,7 @@
 }
 
 .sign_div input {
-    width: 30rem;
+    width: 28rem;
     height: 2.5rem;
     margin: 0.5rem;
     font-size: 20px;
@@ -69,4 +69,7 @@
     color: black;
     border-radius: 5px;
     border: none;
+}
+.have_ac{
+    font-weight: 500;
 }
