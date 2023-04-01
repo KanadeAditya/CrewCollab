@@ -1,12 +1,3 @@
-// const user = {
-//     name: 'user',
-//     rooms: [roomid, roomid2],
-//     msg: {
-//         room_id: [{}, {}],
-//         room_id2: [{}, {}],
-//         room_id: [{}, {}],
-//     }
-// }
 let msgul = document.querySelector(".messages");
 let sendbtn = document.getElementById('send-msg');
 
@@ -17,27 +8,27 @@ console.log(token, '\n', refreshtoken);
 let username = localStorage.getItem("user") || 'usernotfound';
 console.log(username);
 
+const socket = io("http://localhost:4040/", { transports: ["websocket"] });
 // { write a function to fetch all rooms, with their ids & name and call createRoom(roomName, roomID)  } 
-(async function getRooms(){
+(async function getRooms() {
     try {
-        let req=await fetch(`http://localhost:4040/message/roomsConnected`,{
-            method:'GET',
-            headers:{
+        let req = await fetch(`http://localhost:4040/message/roomsConnected`, {
+            method: 'GET',
+            headers: {
                 "authorization": token,
-                "Content-Type":"application/json"
-            }            
+                "Content-Type": "application/json"
+            }
         })
-        let response=await req.json();
-        let rooms=response[0].rooms;
+        let response = await req.json();
+        let rooms = response[0].rooms;
         console.log(rooms);
+        rooms.forEach(e => {
+            createRoom(e.roomname, e.roomID[0]);
+        });
     } catch (error) {
-        console.log({error});
+        console.log({ error });
     }
 })()
-
-const socket = io("http://localhost:4040/", { transports: ["websocket"] });
-
-
 
 function roomCreate() {
     let roomName = prompt("Enter your room",);
@@ -45,7 +36,7 @@ function roomCreate() {
         console.log(roomName);
         console.log('room created', username, roomName);
     }
-    socket.emit("createRoom", { roomName, token }); // room creation
+    socket.emit("createRoom", { token, roomName }); // room creation
 }
 
 function roomJoin() {
@@ -64,15 +55,24 @@ socket.on('room_li_create', (roomName, roomID) => {
 function createRoom(roomName, roomID) {
     let roomList = document.getElementById('rm-list');
     let newRoom = document.createElement('li')
-    newRoom.innerText = `Room ${roomName}`
+    newRoom.innerText = `${roomName}`
     newRoom.setAttribute('class', 'room');
     newRoom.dataset.id = roomID;
     roomList.append(newRoom)
 
-    newRoom.addEventListener('click', (e) => {
-        // console.log(e.target.dataset.id);
+    newRoom.addEventListener('click', async(e) => {
 
         // fetch room messages here and call append function to show message on container
+        let req = await fetch(`http://localhost:4040/message/roomsMessageID/${roomID}`, {
+            method: 'GET',
+            headers: {
+                "authorization": token,
+                "Content-Type": "application/json"
+            }
+        })
+        let response = await req.json();
+        let msgs = response;
+        console.log(msgs); // ### not getting messages of clicked room
 
         socket.emit("onlineUsers", { token, roomID }); // joining room and also getting online users
 
@@ -84,20 +84,15 @@ function createRoom(roomName, roomID) {
 sendbtn.addEventListener('click', (e) => {
     e.preventDefault();
     let newMsg = document.getElementById('new-msg').value;
-    // console.log(newMsg, 'room:', e.target.dataset.room);
-    socket.emit('chatMsg', newMsg, username, e.target.dataset.id);
+    socket.emit('chatMsg', newMsg, token, e.target.dataset.id);
 })
-
-
-
 
 let count = 0;
 socket.on("message", (message) => {
-    // outputMessage(message);
     console.log(message);
     // Append message on container of correct room id.
     let msgli = document.createElement('li')
-    if (message.room == msgul.dataset.id) {
+    if (message.roomID == msgul.dataset.id) {
         msgli.innerHTML = `
         <div class="message-content">
             <span class="username">${message.username}</span>
