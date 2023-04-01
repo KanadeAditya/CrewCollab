@@ -18,11 +18,7 @@ const cors = require("cors");
 
 // const { passport } = require("./google-auth")
 
-
 const { userJoin, getRoomUsers, getCurrentUser, userLeave,  users:onlineusers } = require("./utils/users");
-
-//commented by tarun
-// const { passport } = require("./google-auth")
 
 const app = express();
 app.use(cors());
@@ -36,11 +32,13 @@ const io = new Server(http);
 io.on('connection', (socket) => {
 
    console.log('connected a new user');
-
+   
    socket.on("createRoom", async ({ token, roomName}) => {
       let user = getUser(token);
       
       const roomID=uniqid();
+      console.log(roomID);
+      const online_users = userJoin(socket.id, token, roomID);
 
       // Just for creation of the room
       const newRoom = new RoomModel({ room:roomName, userID:user._id, time:formatTime(), roomID });  //here roomID implemented
@@ -48,13 +46,13 @@ io.on('connection', (socket) => {
 
       // Just for rooms and their connected users
       socket.join(roomID);
+      socket.emit('room_li_create', roomName, roomID);
       socket.emit('message', {username:'CrewCollab', text:`You created the group ${roomName} ${roomID}`,roomID, time:formatTime()});
 
       // Saving user message to DB
       const msg= new MessageModel({email:user.email, message:`You created the group ${roomName}`,roomID, userID:user._id, time:formatTime()});
       await msg.save();
    })
-
 
    socket.on("joinRoom", async ({ token, roomID }) => {
       let user = getUser(token);
@@ -69,6 +67,8 @@ io.on('connection', (socket) => {
       const msg= new MessageModel({email:user.email, message:`${user.name} joined`, roomID, userID:user._id, time:formatTime()});
       await msg.save();
 
+      socket.join(roomID);
+      // socket.emit("message", formatMsg('CrewCollab', `Welcome to Slack`));
       io.to(roomID).emit("roomUsers", {
          roomID,
          users: getRoomUsers(roomID)
@@ -77,6 +77,7 @@ io.on('connection', (socket) => {
       console.log(onlineusers);
 
    })
+
 
    socket.on("chatMsg", async(msg, token, roomID) => {
       let user = getUser(token);
@@ -94,16 +95,15 @@ io.on('connection', (socket) => {
    socket.on('disconnect', (roomID) => {
 
       const user = userLeave(socket.id);
-      let rooms = user?.room||[];
+      let rooms = user?.roomID || [];
       rooms.forEach(e => {
          // socket.broadcast.to(e).emit("message", formatMsg('ChatMe', `${user.username} has left the chat`));
          socket.broadcast.to(e).emit("message",{username:'CrewCollab', text:`${user.username} has left the chat`, roomID, time:formatTime()})
          io.to(e).emit("roomUsers", {
-            room: e,
+            roomID: e,
             users: getRoomUsers(e)
          })
       });
-
    })
 })
 //////////////////////
@@ -148,12 +148,12 @@ app.get("/", (req, res) => {
 //    }); 
 
 
-usersRoute.get("/chat",(req,res)=>{
+usersRoute.get("/chat", (req, res) => {
    res.sendFile("Frontend\chat.html")
 })
 
 app.use("/users", usersRoute);
-app.use("/message",messegerouter);
+app.use("/message", messegerouter);
 
 
 http.listen(process.env.port, async () => {
