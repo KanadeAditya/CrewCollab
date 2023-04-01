@@ -7,6 +7,6 @@ const roomschema = new mongoose.Schema({
     roomID :{type:String,required:true}
 })
 
-const RoomModel = mongoose.model("room",roomschema);
+const RoomModel = mongoose.model("rooms",roomschema);
 
 module.exports = {RoomModel};
