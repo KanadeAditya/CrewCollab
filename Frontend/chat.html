@@ -137,7 +137,7 @@ const client_secret = "1e2bdd5424e9abb53f7422c3017c11c66718da13";
 
       let obj = await res.json();
       console.log(obj);
-      sign_fun(obj)
+      sign_fun(obj ,code)
       
       // alert(data.ms);
       //set token
@@ -155,7 +155,7 @@ const client_secret = "1e2bdd5424e9abb53f7422c3017c11c66718da13";
  
 
 let sign_fun = async (obj) => {
-    console.log(obj)
+    // console.log(obj)
     let newobj = {
     "name" : obj.name,
     "email" : obj.email,
@@ -173,9 +173,15 @@ let sign_fun = async (obj) => {
         let data = await res.json();
         console.log(data);
         // console.log(data.newuser)
-        login_fun(data.newuser,obj.password)
+        if(data.msg==="User Registered"){
+          login_fun(data.newuser,obj.password)
+          alert(data.msg);
+        }else{
+          login_Details(obj)
+        }
+   
 
-        alert(data.msg);
+      
        
       // }
     } catch (error) {
@@ -193,6 +199,64 @@ let login_fun = async (obj,pass) => {
   let newobj = {
     "email" : obj.email,
     "password" : pass
+  }
+  // console.log(newobj)
+    try {
+      let res = await fetch("http://localhost:4040/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newobj),
+      });
+
+      let data = await res.json();
+      console.log(data);
+      alert(data.msg);
+      //set token
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("refreshtoken", data.refreshtoken);
+    } catch (error) {
+      console.log(error);
+      alert("error");
+    }
+  };
+  
+  //new login function
+
+  // let login_Details = async (code) => {
+  //   try {
+  //     let res = await fetch(`http://localhost:4040/users/auth/github?code=${code}`, {
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+       
+  //     });
+
+  //     let obj = await res.json();
+  //     console.log(obj);
+  //     console.log("tarun")
+  //     // sign_fun(obj)
+  //     login_newfun(obj.email,obj.password)
+  //     // alert(data.ms);
+  //     //set token
+  //     // localStorage.setItem("token", data.token);
+  //     // localStorage.setItem("refreshtoken", data.refreshtoken);
+  //   } catch (error) {
+  //     console.log(error);
+  //     alert("error");
+  //   }
+  // };
+
+
+
+
+  
+  let login_Details = async (obj) => {
+  let newobj = {
+    "email" : obj.email,
+    "password" : obj.password
   }
   console.log(newobj)
     try {
