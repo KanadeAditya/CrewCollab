@@ -16,11 +16,12 @@
 }
 
 .sign_div input {
-    width: 30rem;
+    width: 28rem;
     height: 2.5rem;
-    margin: 1rem;
+    margin: 0.5rem;
     font-size: 20px;
     padding-left: 30px;
+
     border-radius: 5px;
     border-color: #1aa3c6;
 }
@@ -31,7 +32,7 @@
 }
 
 .logo {
-    width: 20%;
+    width: 17%;
     margin-top: 50px;
 }
 
@@ -45,4 +46,32 @@
     color: white;
     border-radius: 5px;
     border: none;
+}
+
+
+.git {
+    width: 30rem;
+    height: 2.5rem;
+    /* margin: 0.5rem; */
+    font-size: 20px;
+    padding-left: 30px;
+    /* background-color: #1aa3c6; */
+    color: black;
+    border-radius: 5px;
+    border: none;
+}
+
+.google {
+    width: 30rem;
+    height: 2.5rem;
+    margin: 0.5rem;
+    font-size: 20px;
+    padding-left: 30px;
+    /* background-color: #1aa3c6; */
+    color: black;
+    border-radius: 5px;
+    border: none;
+}
+.have_ac{
+    font-weight: 500;
 }
