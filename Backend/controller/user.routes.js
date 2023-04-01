@@ -150,9 +150,6 @@ usersRoute.get("/userdata/:id", async (req, res) => {
   res.send(data);
 });
 
-
-
-
 //Github Oauth code
 
 // usersRoute.get("/check" , (req,res)=>{
@@ -197,42 +194,12 @@ usersRoute.get("/auth/github", async (req, res) => {
 
   let obj = {
       "name" : userDetails.name,
-      "email" : userDetails.email,
-      "password" :  userDetails.login
+      "email" : userDetails.login,
+      "password" :  `${userDetails.id}`
   }
-  console.log(obj)
-//   res.send("authenticate")
 
-//   let { name,email, password } = obj;
-//   console.log(name,email,password)
-//   const user = new UserModel({email,password,name})
-//   await user.save()
-//   res.send(obj)
-// console.log(obj)
-
-  // sign in login
-// try {
-//     const sign = await fetch("http://localhost:4040/users/signup", {
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json",
-//             Authorization: `Bearer ${access_token}`
-//           },
-//           body: JSON.stringify(obj)
-//       }).then((res) => res.json());
-    
-//       res.send(sign) 
-// } catch (error) {
-//     res.send(error.message)
-// }
-  
-
-
-    // console.log(sign)
-    // res.send(sign.msg)
-    res.send(obj)
-  
-
+  // console.log(obj)
+  res.send(obj);
 
 });
 
