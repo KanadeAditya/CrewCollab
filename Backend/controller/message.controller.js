@@ -104,7 +104,7 @@ messegerouter.get("/roomsMessageID/:roomID",async (req,res)=>{
   let users = await RoomModel.aggregate([
       {
         '$lookup': {
-          'from': 'message', 
+          'from': 'messages', 
           'localField': 'roomID', 
           'foreignField': 'roomID', 
           'as': 'message'

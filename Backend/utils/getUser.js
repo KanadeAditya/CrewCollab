@@ -1,16 +1,18 @@
-const jwt=require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 require("dotenv").config();
 
-async function getUser(token){
-    jwt.verify(token,process.env.normalKey,(err,decoded)=>{
-        if(decoded){
-            return decoded;
+function getUser(token) {
+    let user;
+    jwt.verify(token, process.env.normalKey, (err, decoded) => {
+        if (decoded) {
+            user = decoded;
         }
-        else{
-            return false;
+        else {
+            user= {
+                userID: '1234'
+            };
         }
     })
+    return user;
 }
-
-module.exports={getUser}
-
+module.exports = { getUser }
