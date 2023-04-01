@@ -1,5 +1,4 @@
 const express = require("express");
-const jwt=require('jsonwebtoken');
 
 const { connection, client } = require("./db.js");
 const { usersRoute } = require("./controller/user.routes.js");
@@ -10,7 +9,7 @@ const { authenticator } = require("./middleware/authentication.js");
 
 const { formatMsg } = require('./utils/message');
 
-const { uniqid } = require('uniqid');
+const uniqid = require('uniqid');
 require("dotenv").config();
 const cors = require("cors");
 
@@ -36,9 +35,10 @@ io.on('connection', (socket) => {
 
    socket.on("createRoom", async ({ roomName, token }) => {
       // console.log(token);
-      let roomID = jwt.sign({roomName }, 'roomkey');
-      // const roomID = uniqid();
-
+      
+      const roomID = uniqid(); 
+      console.log(roomID);
+      const online_users = userJoin(socket.id, token, roomID);
       // Just for creation of the room
       //Abhinav--- const newRoom = new RoomModel({ roomName, userID, time: Date.now(), roomID });  //here roomID implemented
       //Abhinav--- await newRoom.save();
@@ -54,29 +54,22 @@ io.on('connection', (socket) => {
       // Abhinav--- await msg.save();
    })
 
-   socket.on("joinRoom", async ({ token, roomID })=>{
-      //fetch roomname by room id
-      let roomName='abc'
+   socket.on("joinRoom", async ({ token, roomID }) => {
+
+      let roomName = 'abc'; // get this from mongodb by roomID
       const online_users = userJoin(socket.id, token, roomID);
       socket.emit('room_li_create', roomName, roomID);
-      socket.broadcast.to(roomID).emit("message", formatMsg('CrewCollab', `${username} joined`), roomID);
 
-   } )
-   socket.on("fetchmessages", async ({ token, roomID }) => {
-      // this function fetches data when user clicks on any rooms  
-      
-
-
-      // socket.emit("message", formatMsg('CrewCollab', `Welcome to Slack`));
-      socket.join(roomID);
-
-
-      
+      // socket.broadcast.to(roomID).emit("message", formatMsg('CrewCollab', `${username} joined`), roomID);
 
       // Abhinav--- const msg = new MessageModel({ email, message: `${username} joined`, roomname: roomID, userID, time: Date.now() });
 
       // Abhinav--- await msg.save();
+   })
+   socket.on("onlineUsers", async ({ token, roomID }) => {
 
+      socket.join(roomID);
+      // socket.emit("message", formatMsg('CrewCollab', `Welcome to Slack`));
       io.to(roomID).emit("roomUsers", {
          roomID,
          users: getRoomUsers(roomID)
@@ -89,7 +82,7 @@ io.on('connection', (socket) => {
    socket.on("chatMsg", (msg, user, roomID) => {
 
 
-      io.to(room).emit("message", formatMsg(user, msg, roomID));
+      io.to(roomID).emit("message", formatMsg(user, msg, roomID));
       // store the message to Mongodb 
 
    });
@@ -99,10 +92,10 @@ io.on('connection', (socket) => {
       const user = userLeave(socket.id);
       let rooms = user?.roomID || [];
       rooms.forEach(e => {
-         socket.broadcast.to(e).emit("message", formatMsg('ChatMe', `${user.username} has left the chat`,e));
-
+         socket.broadcast.to(e).emit("message", formatMsg('ChatMe', `${user.username} has left the chat`, e));
+         console.log(e);
          io.to(e).emit("roomUsers", {
-            room: e,
+            roomID: e,
             users: getRoomUsers(e)
          })
       });
