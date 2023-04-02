@@ -26,51 +26,39 @@ messegerouter.get("/roomsConnected",async(req,res)=>{
     let rooms = await UserModel.aggregate([
       {
         '$lookup': {
-          'from': 'message', 
+          'from': 'messages', 
           'localField': 'email', 
           'foreignField': 'email', 
-          'as': 'message'
+          'as': 'result'
         }
       }, {
         '$unwind': {
-          'path': '$message'
+          'path': '$result'
         }
       }, {
         '$group': {
           '_id': '$email', 
           'rooms': {
-            '$push': '$message.roomname'
-          }
-        }
-      }, {
-        '$unwind': {
-          'path': '$rooms'
-        }
-      }, {
-        '$lookup': {
-          'from': 'room', 
-          'localField': 'rooms', 
-          'foreignField': 'roomname', 
-          'as': 'result'
-        }
-      }, {
-        '$project': {
-          'rooms': 1, 
-          'roomid': '$result.roomID'
-        }
-      }, {
-        '$group': {
-          '_id': '$_id', 
-          'rooms': {
             '$push': {
-              'roomname': '$rooms', 
-              'roomID': '$roomid'
+              'roomname': '$result.roomname', 
+              'roomID': '$result.roomID'
             }
           }
         }
       }, {
         '$match': {
           '_id': `${email}`
+        }
+      }, {
+        '$unwind': {
+          'path': '$rooms'
+        }
+      }, {
+        '$group': {
+          '_id': {
+            'roomid': '$rooms.roomID', 
+            'roomname': '$rooms.roomname'
+          }
         }
       }
     ]);
@@ -84,7 +72,7 @@ messegerouter.get("/roomsMessage/:roomname",async (req,res)=>{
     let users = await RoomModel.aggregate([
         {
           '$lookup': {
-            'from': 'message', 
+            'from': 'messages', 
             'localField': 'roomname', 
             'foreignField': 'roomname', 
             'as': 'message'
@@ -102,19 +90,23 @@ messegerouter.get("/roomsMessage/:roomname",async (req,res)=>{
 messegerouter.get("/roomsMessageID/:roomID",async (req,res)=>{
   let {roomID} = req.params;
   let users = await RoomModel.aggregate([
-      {
-        '$lookup': {
-          'from': 'messages', 
-          'localField': 'roomID', 
-          'foreignField': 'roomID', 
-          'as': 'message'
-        }
-      }, {
-        '$match': {
-          'roomID': `${roomID}`
-        }
+    {
+      '$lookup': {
+        'from': 'messages', 
+        'localField': 'roomID', 
+        'foreignField': 'roomID', 
+        'as': 'result'
       }
-    ])
+    }, {
+      '$match': {
+        'roomID': `${roomID}`
+      }
+    },{
+      '$project': {
+        'result': 1
+      }
+    }
+  ])
 
     res.send(users)
 })

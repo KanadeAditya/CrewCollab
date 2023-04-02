@@ -20,10 +20,12 @@ const socket = io("http://localhost:4040/", { transports: ["websocket"] });
             }
         })
         let response = await req.json();
-        let rooms = response[0].rooms;
-        console.log(rooms);
-        rooms.forEach(e => {
-            createRoom(e.roomname, e.roomID[0]);
+        // let rooms = response[0].rooms;
+        console.log(response);
+        response.forEach(e => {
+            let rn = e._id.roomname;
+            let ri = e._id.roomid;
+            createRoom(rn, ri);
         });
     } catch (error) {
         console.log({ error });
@@ -71,7 +73,7 @@ function createRoom(roomName, roomID) {
             }
         })
         let response = await req.json();
-        let msgs = response;
+        let msgs = response[0].result;
         console.log(msgs); // ### not getting messages of clicked room
 
         socket.emit("onlineUsers", { token, roomID }); // joining room and also getting online users
