@@ -5,9 +5,6 @@ const { UserModel } = require("../model/user.model.js");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 
-//cors
-
-
 //////////REDIS//////////////////
 
 const redis = require("redis");
@@ -151,10 +148,6 @@ usersRoute.get("/userdata/:id", async (req, res) => {
 });
 
 //Github Oauth code
-
-// usersRoute.get("/check" , (req,res)=>{
-//     res.send("tarun")
-// })
 
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));

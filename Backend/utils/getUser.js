@@ -3,6 +3,7 @@ require("dotenv").config();
 
 function getUser(token) {
     let user;
+    console.log(token);
     jwt.verify(token, process.env.normalKey, (err, decoded) => {
         if (decoded) {
             user = decoded;
@@ -12,7 +13,9 @@ function getUser(token) {
                 userID: '1234'
             };
         }
+        // console.log(decoded)
     })
+    
     return user;
 }
 module.exports = { getUser }
