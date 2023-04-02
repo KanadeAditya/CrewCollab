@@ -7,7 +7,7 @@ CrewCollab is a collaborative messaging platform designed to help teams work tog
 
 ## Demo
 
-Insert gif or link to demo
+[CrewCollab Web Page](https://monumental-travesseiro-66a6ea.netlify.app/login.html)
 
 
 ## Authors
