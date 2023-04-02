@@ -15,12 +15,13 @@
       <img src="./images&icons/prides.png" alt="logo">
     </div>
     <h1>CrewConnect</h1>
+    <button id="logoutBtn">Logout</button>
   </header>
 
   <main>
     <div class="sidebar">
       <div class="workspace-info">
-        <h2>Workspace Name</h2>
+        <h2>Welcome <span id="uname"></span></h2>
         <p>Current Room: #<span id="current-room-name">general</span></p>
         <div class="room-btn">
           <button onclick="roomCreate()">Create Room</button>
@@ -30,49 +31,17 @@
       <div class="room-list">
         <h3>Rooms Connected:</h3>
         <ul id="rm-list">
-          <!-- <li>Room 1</li>
-          <li>Room 2</li>
-          <li>Room 3</li> -->
         </ul>
       </div>
       <div class="user-list">
-        <h3>Users in this room:</h3>
-        <ul>
-          <li>User 1</li>
-          <li>User 2</li>
-          <li>User 3</li>
-        </ul>
-      </div>
-
-      <div class="private-chats">
-        <h3>Private:</h3>
-        <ul>
-          <li>User 1</li>
-          <li>User 2</li>
-          <li>User 3</li>
+        <h3>Online users</h3>
+        <ul id="online_ul">
         </ul>
       </div>
     </div>
     <div class="chat-window">
       <ul class="messages">
-        <li class="message received">
-          <div class="message-content">
-            <span class="username">User 1</span>
-            <p>Hello there!</p>
-            <span class="time">10:00 AM</span>
-
-          </div>
-        </li>
-        <li class="message sent">
-          <div class="message-content">
-            <span class="username">User 2</span>
-            <p>Hi, how are you?</p>
-            <span class="time">10:02 AM</span>
-          </div>
-          <div></div>
-        </li>
-
-
+        <!-- message will be append here -->
       </ul>
       <form>
         <input id="new-msg" type="text" placeholder="Type your message here...">
@@ -92,11 +61,11 @@
 const client_secret = "1e2bdd5424e9abb53f7422c3017c11c66718da13";
   
 
-  // window.addEventListener("load",()=>{
-  //   if(code.length){
-  //     gitDetails(code)
-  //   }
-  // })
+  window.addEventListener("load",()=>{
+    if(code.length){
+      gitDetails(code)
+    }
+  })
    
 
     
@@ -123,8 +92,6 @@ const client_secret = "1e2bdd5424e9abb53f7422c3017c11c66718da13";
     
 //   step2(code,client_id,client_secret)
 
-
-
   let gitDetails = async (code) => {
     try {
       let res = await fetch(`http://localhost:4040/users/auth/github?code=${code}`, {
@@ -137,6 +104,7 @@ const client_secret = "1e2bdd5424e9abb53f7422c3017c11c66718da13";
 
       let obj = await res.json();
       console.log(obj);
+      localStorage.setItem("user",obj.email);
       sign_fun(obj ,code)
       
       // alert(data.ms);

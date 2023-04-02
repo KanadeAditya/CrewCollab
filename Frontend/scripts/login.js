@@ -23,11 +23,16 @@ let sign_fun = async (obj) => {
         let data = await res.json();
         console.log(data);
         alert(data.msg);
-        //set token
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("refreshtoken", data.refreshtoken);
-        localStorage.setItem('user',obj.email);
-        window.location.href='chat.html';
+        if(data.msg==='user logged in'){
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("refreshtoken", data.refreshtoken);
+            localStorage.setItem('user',obj.email);
+            window.location.href='chat.html';
+        }
+        else{
+            alert('Something went wrong. Please check your credentials again..!');
+        }
+        
     } catch (error) {
         console.log(error);
         alert("error");

@@ -147,6 +147,25 @@ button {
     cursor: pointer;
 }
 
+#logoutBtn{
+    border: 5px solid #98236b;
+    border-radius: 20px;
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    height: 60px;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+}
+
 button:hover {
     background-color: #522c70;
+    transition: 0.3s background-color;
+    }
+
+button{
+    transition: 0.3s background-color;
 }

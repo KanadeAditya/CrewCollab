@@ -25,7 +25,7 @@ let sign_function = async (obj) => {
         let data = await res.json();
         console.log(data);
         alert(data.msg);
-        window.location.href = "login.html"
+        window.location.href = "./login.html"
         // }
     } catch (error) {
         console.log(error);
@@ -48,33 +48,6 @@ if(code.length){
 }
 })
 
-
-
-
-//   let accessToken =  fetch("https://github.com/login/oauth/access_token", {
-//     method: "POST",
-//     headers: {
-//       Accept: "application/json",
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({
-//       client_id: client_id,
-//       client_secret: client_secret,
-//       code,
-//     }),
-//   })
-//   .then((res) => res.json());
-
-// console.log(accessToken)
-
-//   //access token
-//   const access_token = accessToken.access_token;
-// console.log(access_token)
-
-//   step2(code,client_id,client_secret)
-
-
-
 let gitDetails = async (code) => {
 try {
   let res = await fetch(`http://localhost:4040/users/auth/github?code=${code}`, {
@@ -89,10 +62,6 @@ try {
   console.log(obj);
   sign_fun(obj)
   
-  // alert(data.ms);
-  //set token
-  // localStorage.setItem("token", data.token);
-  // localStorage.setItem("refreshtoken", data.refreshtoken);
 } catch (error) {
   console.log(error);
   alert("error");
@@ -119,19 +88,11 @@ try {
     },
     body: JSON.stringify(newobj),
   })
-  // if(res) {
-    let data = await res.json();
-    console.log(data);
-    // console.log(data.newuser)
-    login_fun(data.newuser,obj.password)
 
-  
-        alert(data.msg);
-    
-
- 
-   
-  // }
+  let data = await res.json();
+  console.log(data);
+  login_fun(data.newuser,obj.password)
+  alert(data.msg);
 } catch (error) {
   console.log(error);
   alert("error");
@@ -140,9 +101,6 @@ try {
 
 
 //login
-
-
-
 let login_fun = async (obj,pass) => {
 let newobj = {
 "email" : obj.email,
@@ -169,5 +127,3 @@ try {
   alert("error");
 }
 };
-
-

@@ -14,9 +14,7 @@ const cryptr = new Cryptr(process.env.crypterKey);
 require("dotenv").config();
 const cors = require("cors");
 
-// const { passport } = require("./google-auth")
-
-const { userJoin, getRoomUsers, userLeave, users: onlineusers } = require("./utils/users");
+const { userJoin, getRoomUsers, userLeave } = require("./utils/users");
 
 const app = express();
 app.use(cors());
@@ -32,9 +30,9 @@ io.on('connection', (socket) => {
 
    socket.on("createRoom", async ({ token, roomName }) => {
       let user = getUser(token);
-      console.log(user);
+
       const roomID = uniqid();
-      const online_users = userJoin(socket.id, token, roomID);
+      userJoin(socket.id, user.name, roomID);
 
       // Just for creation of the room
       const newRoom = new RoomModel({ room: roomName, userID: user.userID, time: formatTime(), roomID });  //here roomID implemented
@@ -43,10 +41,10 @@ io.on('connection', (socket) => {
       // Just for rooms and their connected users
       socket.join(roomID);
       socket.emit('room_li_create', roomName, roomID);
-      socket.emit('message', { username: 'CrewCollab', text: `You created the group ${roomName} ${roomID}`, roomID, time: formatTime() });
+      socket.emit('message', { email: 'CrewCollab', email:user.email, message: `${user.email} created the group ${roomName} ${roomID}`, roomID, time: formatTime() });
 
       // Saving user message to DB
-      const msg = new MessageModel({ email: user.email, message: `You created the group ${roomName}`, userID: user.userID, roomname: roomName, roomID, time: formatTime() });
+      const msg = new MessageModel({ email: user.email, message: cryptr.encrypt(`${user.email} created the group ${roomName} ${roomID}`), userID: user.userID, roomname: roomName, roomID, time: formatTime() });
       await msg.save();
    })
 
@@ -54,17 +52,17 @@ io.on('connection', (socket) => {
       let user = getUser(token);
       let data = await RoomModel.findOne({ roomID });
       let roomName = data.room;
-      console.log(roomName);
 
       // Below function is just checking the onlne users
-      const online_users = userJoin(socket.id, user.userID, roomID);
       socket.emit('room_li_create', roomName, roomID);
-      socket.emit("message", { username: 'CrewCollab', text: `Welcome to CrewCollab`, roomID, time: formatTime() });
+      socket.emit("message", { email: 'CrewCollab', message: `Welcome to CrewCollab`, roomID, time: formatTime() });
       socket.join(roomID);
 
-      socket.broadcast.to(roomID).emit("message", { username: 'CrewCollab', text: `${user.name} joined`, roomID, time: formatTime() })
-      const msg = new MessageModel({ email: user.email, message: `${user.name} joined`, userID: user.userID, roomname: roomName, roomID, time: formatTime() });
+      socket.broadcast.to(roomID).emit("message", { email: 'CrewCollab', message: `${user.name} joined`, roomID, time: formatTime() })
+      const msg = new MessageModel({ email: user.email, message: cryptr.encrypt(`${user.name} joined`), userID: user.userID, roomname: roomName, roomID, time: formatTime() });
       await msg.save();
+
+      userJoin(socket.id, user.name, roomID);
 
       io.to(roomID).emit("roomUsers", {
          roomID,
@@ -75,14 +73,15 @@ io.on('connection', (socket) => {
 
    socket.on("onlineUsers", async ({ token, roomID }) => {
 
+      let user = getUser(token);
+      userJoin(socket.id, user.name, roomID);
+
       socket.join(roomID);
 
       io.to(roomID).emit("roomUsers", {
          roomID,
          users: getRoomUsers(roomID)
       });
-
-      console.log(onlineusers);
 
    })
 
@@ -94,19 +93,18 @@ io.on('connection', (socket) => {
       const encryptedMsg = cryptr.encrypt(msg);
       const decryptedMsg = cryptr.decrypt(encryptedMsg);
 
-      socket.to(roomID).emit('message', decryptedMsg);
       const newMsg = new MessageModel({ email: user.email, message: encryptedMsg, userID: user.userID, roomname:roomName, roomID, time: Date.now() });
       await newMsg.save();
 
-      io.to(roomID).emit("message", { username: user.name, text: decryptedMsg, roomID, time: formatTime() });
+      io.to(roomID).emit("message", { email: user.email, message: decryptedMsg, roomID, time: formatTime() });
    });
 
-   socket.on('disconnect', (roomID) => {
+   socket.on('disconnect', () => {
 
       const user = userLeave(socket.id);
       let rooms = user?.roomID || [];
       rooms.forEach(e => {
-         socket.broadcast.to(e).emit("message", { username: 'CrewCollab', text: `${user.username} has left the chat`, roomID: e, time: formatTime() })
+         socket.broadcast.to(e).emit("message", { email: 'CrewCollab', message: `${user.email} has left the chat`, roomID: e, time: formatTime() })
          io.to(e).emit("roomUsers", {
             roomID: e,
             users: getRoomUsers(e)
@@ -115,53 +113,12 @@ io.on('connection', (socket) => {
    })
 })
 
-app.get('/', (req, res) => {
-   // Login page will be sent from here
-   res.status(200).send('Welcome to SlackBot....');
-})
-
-
-app.get("/", (req, res) => {
-   res.send("Home Page")
-})
-
-// Abhinav
-// app.get('/auth/google',
-//    passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-
-// app.get('/auth/google',
-//    passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-
-// app.get('/auth/google/callback',
-//    passport.authenticate('google', { failureRedirect: '/login', session: false }),
-//    function (req, res) {
-//       console.log(req.user);
-//       // Successful authentication, redirect home.
-//       res.redirect('/');
-//    });
-
-
-
-
-
-// app.get('/auth/google/callback',
-//    passport.authenticate('google', { failureRedirect: '/login', session: false }),
-//    function (req, res) {
-//       console.log(req.user);
-//       // Successful authentication, redirect home.
-//       res.redirect('/');
-//    }); 
-
-
 usersRoute.get("/chat", (req, res) => {
    res.sendFile("Frontend\chat.html")
 })
 
 app.use("/users", usersRoute);
 app.use("/message", messegerouter);
-
 
 http.listen(process.env.port, async () => {
    try {

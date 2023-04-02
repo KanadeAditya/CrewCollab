@@ -9,7 +9,7 @@ const jwt = require("jsonwebtoken")
 const {authenticator} = require("../middleware/authentication.js");
 
 const Cryptr = require('cryptr');
-const cryptr = new Cryptr(process.env.encryptionkey);
+const cryptr = new Cryptr(process.env.crypterKey);
 
 
 
@@ -107,9 +107,19 @@ messegerouter.get("/roomsMessageID/:roomID",async (req,res)=>{
       }
     }
   ])
-
+  console.log(users);
+    users[0].result.forEach((item)=>{
+      let decrptedMsg=cryptr.decrypt(item.message);
+      item.message=decrptedMsg;
+      console.log(item.message)
+    })
+    console.log(users);
     res.send(users)
 })
 
+messegerouter.get('/getUsername',(req,res)=>{
+  let {name}=req.body;
+  res.send({name});
+})
 
 module.exports = {messegerouter};
