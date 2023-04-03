@@ -104,7 +104,7 @@ io.on('connection', (socket) => {
       const user = userLeave(socket.id);
       let rooms = user?.roomID || [];
       rooms.forEach(e => {
-         socket.broadcast.to(e).emit("message", { email: 'CrewCollab', message: `${user.email} has left the chat`, roomID: e, time: formatTime() })
+         socket.broadcast.to(e).emit("message", { email: 'CrewCollab', message: `${user.username} has left the chat`, roomID: e, time: formatTime() })
          io.to(e).emit("roomUsers", {
             roomID: e,
             users: getRoomUsers(e)
